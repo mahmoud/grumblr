@@ -67,14 +67,14 @@ class Grumblog(object):
             json.dump(to_write, f)
         return
 
-    def get_posts_by_tag(self):
-        pbt = OMD()
+    def get_tag_posts_map(self):
+        tpm = OMD()
         for post_id, post in self.posts.iteritems():
             for tag in post['tags']:
-                pbt.add(tag, post)
-        # pop_tags = sorted(pbt.counts().items(), key=lambda x: x[1],
+                tpm.add(tag, post)
+        # pop_tags = sorted(tpm.counts().items(), key=lambda x: x[1],
         #                   reverse=True)
-        return pbt
+        return tpm
 
     def get_nonlower_tag_map(self):
         nltm = OMD()
@@ -84,16 +84,46 @@ class Grumblog(object):
                     nltm.add(tag, post)
         return nltm
 
+    def get_untagged_posts(self):
+        return OMD([(pid, post) for pid, post in self.posts.iteritems()
+                    if not post['tags']])
+
+    def get_report_dict(self):
+        # TODO: first post date?
+        posts = self.posts
+        ret = {'blog_name': self.blog_name,
+               'last_fetched': self.last_fetched,
+               'post_count': len(posts)}
+        tpm = self.get_tag_posts_map()
+        ret['tag_count'] = len(tpm)
+        ret['tag_count_map'] = OMD(sorted(tpm.counts().items(),
+                                          key=lambda x: x[1],
+                                          reverse=True))
+        tag_rate = 1.0 - (1.0 * len(self.get_untagged_posts()) / len(posts))
+        ret['tag_percent'] = round(100.0 * tag_rate, 2)
+        tag_post_ratio = float(sum(tpm.counts().values())) / len(posts)
+        ret['tag_post_ratio'] = round(tag_post_ratio, 2)
+
+        return ret
+
 
 class Grumblr(object):
 
     _blog_type = Grumblog
 
     def __init__(self, home_path=DEFAULT_HOME_PATH, **kwargs):
+        self.default_blog_name = kwargs.pop('blog_name', None)
+        self.default_action = kwargs.pop('action', None)
+
+        self.concurrency = kwargs.pop('concurrency', DEFAULT_CONCURRENCY)
+
         self.home_path = expanduser(home_path)
         default_config_path = self.home_path + 'config.yaml'
         self.config_path = expanduser(kwargs.pop('config_path',
                                                  default_config_path))
+        if kwargs:
+            raise TypeError('unexpected keyword arguments: %r' % kwargs.keys())
+
         if not os.path.exists(self.home_path):
             mkdir_p(self.home_path)
         if not os.path.isfile(self.config_path):
@@ -106,7 +136,7 @@ class Grumblr(object):
         self.blogs_path = self.home_path + 'blogs/'
         if not os.path.exists(self.blogs_path):
             mkdir_p(self.blogs_path)
-        self.concurrency = kwargs.pop('concurrency', DEFAULT_CONCURRENCY)
+
         self.client = pytumblr.TumblrRestClient(config['consumer_key'],
                                                 config['consumer_secret'],
                                                 config['oauth_token'],
@@ -167,12 +197,19 @@ class Grumblr(object):
     @classmethod
     def get_argparser(cls):
         prs = argparse.ArgumentParser()
+        subprs = prs.add_subparsers(dest='action',
+                                    help='grumblr supports fetch and report'
+                                    ' subcommands')
+        subprs.add_parser('report',
+                          help='generate a report about a blog')
+
         add_arg = prs.add_argument
         add_arg('--home', default=DEFAULT_HOME_PATH,
                 help='grumblr home path, with cached blogs, config, etc.'
                 'defaults to ~/.grumblr')
         add_arg('--conc', default=DEFAULT_CONCURRENCY,
                 help='number of concurrent requests to allow during fetches')
+        add_arg('blog_name', help='the target blog')
         return prs
 
     @classmethod
@@ -184,11 +221,6 @@ class Grumblr(object):
         for src, dest in kwarg_map.items():
             kwargs[dest] = kwargs.pop(src)
         return cls(**kwargs)
-
-
-def main():
-    grumbl = Grumblr.from_args()
-    import pdb;pdb.set_trace()
 
 
 def coalesce_tag(blog_name, posts, client, src_tag, dest_tag):
