@@ -200,6 +200,8 @@ class Grumblr(object):
         subprs = prs.add_subparsers(dest='action',
                                     help='grumblr supports fetch and report'
                                     ' subcommands')
+        subprs.add_parser('fetch',
+                          help='fetch and save a local version of a blog')
         subprs.add_parser('report',
                           help='generate a report about a blog')
 
