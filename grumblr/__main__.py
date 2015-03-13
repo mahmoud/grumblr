@@ -22,7 +22,7 @@ HTML_REPORT = """\
 <p>{blog_name} has {post_count}+ posts, {tag_percent}% of which are tagged with {tag_count}+ tags, with an average of {tag_post_ratio} tags per post:
   <ul>
   {@iterate key=tag_count_map}
-  <li><a href="http://{blog_name}.tumblr.com/tagged/{$key}">{$key}</a> ({$value})</li>{/iterate}
+  <li><a href="http://{blog_domain}/tagged/{$key}">{$key}</a> ({$value})</li>{/iterate}
   </ul>
 </p>
 """

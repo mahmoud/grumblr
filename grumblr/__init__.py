@@ -39,6 +39,13 @@ class Grumblog(object):
         self.posts = posts
         self.changes = []
 
+    @property
+    def blog_domain(self):
+        if '.' in self.blog_name:
+            return self.blog_name
+        else:
+            return '%s.tumblr.com' % self.blog_name
+
     @classmethod
     def from_dict(cls, blog_dict):
         bd = blog_dict
@@ -92,6 +99,7 @@ class Grumblog(object):
         # TODO: first post date?
         posts = self.posts
         ret = {'blog_name': self.blog_name,
+               'blog_domain': self.blog_domain,
                'last_fetched': self.last_fetched,
                'post_count': len(posts)}
         tpm = self.get_tag_posts_map()
