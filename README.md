@@ -1,5 +1,7 @@
 # grumblr
 
+![grumblr lolgo](https://raw.githubusercontent.com/mahmoud/grumblr/master/grumblr.png)
+
 grumblr is a maintenance tool originally created to fix long-standing
 tumblr nuisances (such as no automatic tag page generation and
 non-normalized case in tags, etc.).
