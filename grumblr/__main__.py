@@ -14,6 +14,18 @@ def main():
         blog = grumbl.load_blog(blog_name)
         rendered = ashes.render('html_report', blog.get_report_dict())
         print rendered.encode('utf-8')
+    elif action == 'coalesce':
+        print 'coalescing', grumbl.kwargs['coalesce_tags']
+        blog = grumbl.load_blog(blog_name)
+        grumbl.coalesce_tag(blog, grumbl.kwargs['coalesce_tags'])
+    elif action == 'coalesce_lower':
+        print 'coalescing tags to their lowercased counterpart'
+        blog = grumbl.load_blog(blog_name)
+        grumbl.coalesce_tags_to_lower(blog)
+    elif action == 'coalesce_plural':
+        print 'coalescing tags to their plural counterpart'
+        blog = grumbl.load_blog(blog_name)
+        grumbl.coalesce_tags_to_plural(blog)
     else:
         raise RuntimeError('unknown action "%s"' % action)
 
