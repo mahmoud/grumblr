@@ -21,6 +21,8 @@ from progressbar import ProgressBar, Bar, Percentage, SimpleProgress
 
 DEFAULT_CONCURRENCY = 20
 
+# TODO: on report generation, if there's just one post under a tag, link directly to the post.
+
 
 def print_dot():
     sys.stdout.write('.')
@@ -347,7 +349,7 @@ class Grumblr(object):
                 help='the name of the target tumblr site')
         add_arg('--home', default=DEFAULT_HOME_PATH,
                 help='grumblr home path, with cached blogs, config, etc.'
-                'defaults to ~/.grumblr')
+                ' defaults to ~/.grumblr')
         add_arg('--conc', default=DEFAULT_CONCURRENCY,
                 help='number of concurrent requests to allow during fetches')
 
