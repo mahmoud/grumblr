@@ -13,7 +13,7 @@ from os.path import expanduser
 import yaml
 import pytumblr
 from boltons.dictutils import OMD
-from boltons.osutils import mkdir_p
+from boltons.fileutils import mkdir_p
 from boltons.setutils import IndexedSet
 from boltons.strutils import pluralize
 from progressbar import ProgressBar, Bar, Percentage, SimpleProgress

@@ -10,7 +10,7 @@ from setuptools import setup
 
 
 __author__ = 'Mahmoud Hashemi'
-__version__ = '0.0.4dev'
+__version__ = '0.0.4'
 __contact__ = 'mahmoudrhashemi@gmail.com'
 __url__ = 'https://github.com/mahmoud/grumblr'
 __license__ = 'BSD'
@@ -29,8 +29,8 @@ if __name__ == '__main__':
           author_email=__contact__,
           url=__url__,
           packages=['grumblr'],
-          install_requires=['ashes==0.7.3',
-                            'boltons==0.4.2',
+          install_requires=['ashes==15.0.0',
+                            'boltons==15.0.1',
                             'gevent==1.0.1',
                             'progressbar==2.3',
                             'PyTumblr==0.0.6',
