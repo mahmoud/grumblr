@@ -239,6 +239,8 @@ class Grumblr(object):
                                         range(20, total_posts, step)):
             cur_posts = resp['posts']
             posts.update([(p['id'], p) for p in cur_posts])
+            if len(posts) > pb.maxval:
+                pb.maxval = len(posts)
             pb.update(len(posts))
 
         pool.join(timeout=0.3, raise_error=True)
