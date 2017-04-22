@@ -19,7 +19,7 @@ from boltons.strutils import pluralize
 from progressbar import ProgressBar, Bar, Percentage, SimpleProgress
 
 
-DEFAULT_CONCURRENCY = 20
+DEFAULT_CONCURRENCY = 2
 
 # TODO: on report generation, if there's just one post under a tag, link directly to the post.
 
@@ -175,12 +175,13 @@ class Grumblr(object):
         self.default_blog_name = kwargs.pop('blog_name', None)
         self.default_action = kwargs.pop('action', None)
 
-        self.concurrency = kwargs.pop('concurrency', DEFAULT_CONCURRENCY)
+        self.concurrency = int(kwargs.pop('concurrency', DEFAULT_CONCURRENCY))
 
         self.home_path = expanduser(home_path)
         default_config_path = self.home_path + 'config.yaml'
         self.config_path = expanduser(kwargs.pop('config_path',
                                                  default_config_path))
+        self.debug = kwargs.pop('debug', None)
         self.kwargs = kwargs
 
         if not os.path.exists(self.home_path):
@@ -235,9 +236,18 @@ class Grumblr(object):
             return client.posts(blog_name, offset=offset, limit=step,
                                 filter='raw')
 
+        errors = []
         for resp in pool.imap_unordered(_get_posts,
                                         range(20, total_posts, step)):
-            cur_posts = resp['posts']
+            try:
+                cur_posts = resp['posts']
+            except KeyError:
+                # likely error (a lot of these started occurring after
+                # tumblr was put behind yahoo load balancers/rate
+                # limiters. they just return blank pages instead of
+                # any real error)
+                errors.append(resp)
+                continue
             posts.update([(p['id'], p) for p in cur_posts])
             if len(posts) > pb.maxval:
                 pb.maxval = len(posts)
@@ -245,6 +255,9 @@ class Grumblr(object):
 
         pool.join(timeout=0.3, raise_error=True)
         print 'Done, saving', len(posts), 'posts.'
+        if errors:
+            print 'Note: %s error(s) were encountered:' % len(errors)
+            print '\n'.join(['    %r' % e for e in errors])
 
         save_path = self.blogs_path + '%s.json' % blog_name
         fetched_blog = Grumblog(blog_name=blog_name,
@@ -349,6 +362,8 @@ class Grumblr(object):
         add_arg = prs.add_argument
         add_arg('--site', required=True,
                 help='the name of the target tumblr site')
+        add_arg('--debug', action="store_true",
+                help='enable debug console on errors')
         add_arg('--home', default=DEFAULT_HOME_PATH,
                 help='grumblr home path, with cached blogs, config, etc.'
                 ' defaults to ~/.grumblr')

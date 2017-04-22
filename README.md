@@ -12,8 +12,8 @@ Right now grumblr is mostly for programmatic use, but it has a basic CLI:
 
 ```
 $ pip install grumblr
-$ python -m grumblr fetch blog_name
-$ python -m grumblr report blog_name
+$ python -m grumblr --site blog_name fetch
+$ python -m grumblr --site blog_name report
 ```
 
 Have fun grumblin!
