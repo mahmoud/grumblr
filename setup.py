@@ -1,7 +1,7 @@
 """
     Maintenance utility for tumblr blogs.
 
-    :copyright: (c) 2015 by Mahmoud Hashemi
+    :copyright: (c) 2017 by Mahmoud Hashemi
     :license: BSD, see LICENSE for more details.
 """
 
@@ -10,7 +10,7 @@ from setuptools import setup
 
 
 __author__ = 'Mahmoud Hashemi'
-__version__ = '0.0.5'
+__version__ = '0.0.6dev'
 __contact__ = 'mahmoudrhashemi@gmail.com'
 __url__ = 'https://github.com/mahmoud/grumblr'
 __license__ = 'BSD'
