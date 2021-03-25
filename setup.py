@@ -34,7 +34,7 @@ if __name__ == '__main__':
                             'gevent==1.2.1',
                             'progressbar==2.3',
                             'PyTumblr==0.0.6',
-                            'PyYAML==3.11'],
+                            'PyYAML==5.4'],
           include_package_data=True,
           zip_safe=False,
           license=__license__,
